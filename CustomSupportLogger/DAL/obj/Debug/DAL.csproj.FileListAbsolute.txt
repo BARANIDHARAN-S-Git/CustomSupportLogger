@@ -1,0 +1,12 @@
+C:\newvs\CustomSupportLogger\DAL\bin\Debug\DAL.dll
+C:\newvs\CustomSupportLogger\DAL\bin\Debug\DAL.pdb
+C:\newvs\CustomSupportLogger\DAL\obj\Debug\DAL.csproj.AssemblyReference.cache
+C:\newvs\CustomSupportLogger\DAL\obj\Debug\DAL.csproj.CoreCompileInputs.cache
+C:\newvs\CustomSupportLogger\DAL\obj\Debug\DAL.dll
+C:\newvs\CustomSupportLogger\DAL\obj\Debug\DAL.pdb
+C:\newvs\CustomSupportLogger\DAL\bin\Debug\DAL.dll.config
+C:\newvs\CustomSupportLogger\DAL\bin\Debug\EntityFramework.dll
+C:\newvs\CustomSupportLogger\DAL\bin\Debug\EntityFramework.SqlServer.dll
+C:\newvs\CustomSupportLogger\DAL\bin\Debug\EntityFramework.xml
+C:\newvs\CustomSupportLogger\DAL\bin\Debug\EntityFramework.SqlServer.xml
+C:\newvs\CustomSupportLogger\DAL\obj\Debug\DAL.csproj.CopyComplete
