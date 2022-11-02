@@ -1,0 +1,295 @@
+GithubLink:https://github.com/BARANIDHARAN-S-Git/CustomSupportLogger
+--------------------------------HomeController.cs----------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using DAL;
+
+namespace CustomSupportLogger.Controllers
+{
+    public class HomeController : Controller
+    {
+        Validation v = null;
+        AddCustomerComplaints a=null;
+
+        public HomeController()
+        {
+            v= new Validation();
+            a= new AddCustomerComplaints();
+        }
+        public ActionResult Index()
+        {
+            return View();
+        }
+
+        public ActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult Login(FormCollection collection)
+        {
+            bool result = v.UserValidation(Convert.ToInt32(Request["UserId"]), Request["Password"]);
+            if (result)
+            {
+                return RedirectToAction("CustomerComplaints");
+            }
+            return RedirectToAction("Login");
+
+        }
+
+        public ActionResult CustomerComplaints()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult CustomerComplaints(FormCollection collection)
+        {
+            CustLogInfo l=new CustLogInfo();
+            l.LogId = Convert.ToInt32(Request["LogId"]);
+            l.CustEmail = Request["CustEmail"];
+            l.CustName = Request["CustName"];
+            l.LogStatus = Request["LogStatus"];
+            l.UserId = Convert.ToInt32(Request["UserId"]);
+            l.Description = Request["Description"];
+            a.Add(l);
+            return RedirectToAction("Login");
+        }
+
+        public ActionResult About()
+        {
+            ViewBag.Message = "Your application description page.";
+
+            return View();
+        }
+
+        public ActionResult Contact()
+        {
+            ViewBag.Message = "Your contact page.";
+
+            return View();
+        }
+    }
+}
+------------------------------CustLogInfoModel.cs----------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace CustomSupportLogger.Models
+{
+    public class CustLogInfoModel
+    {
+        public int LogId { get; set; }
+
+        public string CustEmail { get; set; }
+
+        public string CustName { get; set; }
+
+        public string LogStatus { get; set; }
+
+        public int UserId { get; set; }
+
+        public string Description { get; set; }
+    }
+}
+------------------------------UserInfoModel.cs-------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Policy;
+using System.Web;
+
+namespace CustomSupportLogger.Models
+{
+    public class UserInfoModel
+    {
+        public int UserId { get; set; }
+
+        public string Email { get; set; }
+
+        public string password { get; set; }
+    }
+}
+-----------------------------------AddCustomerComplaints.cs-------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DAL
+{
+    public class AddCustomerComplaints
+    {
+
+        customsupportloggerdbEntities user = null;
+        public AddCustomerComplaints()
+        {
+            user = new customsupportloggerdbEntities();
+        }
+        public bool Add(CustLogInfo a)
+        {
+            bool ans =true;
+            try
+            {
+                user.CustLogInfoes.Add(a);
+                user.SaveChanges();
+               
+
+                return ans;
+
+
+            }
+            catch(Exception)
+            {
+                ans=false;
+                return ans;
+            }
+        }
+    }
+}
+--------------------------------------------------customersupportloggerdbEntities----------------------
+namespace DAL
+{
+    using System;
+    using System.Data.Entity;
+    using System.Data.Entity.Infrastructure;
+    
+    public partial class customsupportloggerdbEntities : DbContext
+    {
+        public customsupportloggerdbEntities()
+            : base("name=customsupportloggerdbEntities")
+        {
+        }
+    
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            throw new UnintentionalCodeFirstException();
+        }
+    
+        public virtual DbSet<CustLogInfo> CustLogInfoes { get; set; }
+        public virtual DbSet<UserInfo> UserInfoes { get; set; }
+    }
+}
+-----------------------------CustLogInfo.cs---------------------------------
+namespace DAL
+{
+    using System;
+    using System.Collections.Generic;
+    
+    public partial class CustLogInfo
+    {
+        public int LogId { get; set; }
+        public string CustEmail { get; set; }
+        public string CustName { get; set; }
+        public string LogStatus { get; set; }
+        public Nullable<int> UserId { get; set; }
+        public string Description { get; set; }
+    
+        public virtual UserInfo UserInfo { get; set; }
+    }
+}
+--------------------------------------UserInfo.cs------------------------------------------
+namespace DAL
+{
+    using System;
+    using System.Collections.Generic;
+    
+    public partial class UserInfo
+    {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public UserInfo()
+        {
+            this.CustLogInfoes = new HashSet<CustLogInfo>();
+        }
+    
+        public int UserId { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+    
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<CustLogInfo> CustLogInfoes { get; set; }
+    }
+}
+--------------------------------------Validation.cs--------------------------
+using Microsoft.SqlServer.Server;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DAL
+{
+    public class Validation
+    {
+        customsupportloggerdbEntities user = null;
+        public Validation()
+        {
+            user = new customsupportloggerdbEntities();
+        }
+
+        public bool UserValidation(int userid,string password)
+        {
+            bool result=false;
+            var ans = user.UserInfoes.ToList().Find(a => a.UserId == userid);
+            if(ans!=null)
+            {
+                if(ans.Password==password)
+                {
+                    result=true;
+                }
+            }
+            return result;
+        }
+    }
+}
+---------------------------------------CustomSupportLoggerTest.cs---------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using DAL;
+using NUnit.Framework;
+
+
+namespace DALTest
+{
+    [TestFixture]
+    public class CustomSupportLoggerTest
+    {
+        Validation v = null;
+        AddCustomerComplaints a = null;
+        public CustomSupportLoggerTest()
+        {
+            v= new Validation();
+            a = new AddCustomerComplaints();
+        }
+
+        [TestCase(101,"admin@123",ExpectedResult =true)]
+        [TestCase(201, "admin@123", ExpectedResult =false)]
+      
+        public bool UserInfoTest(int userid,string password)
+        {
+            return v.UserValidation(userid,password);
+        }
+
+       
+        [TestCase(101,ExpectedResult =true)]
+        [TestCase(201,ExpectedResult = false)]
+        public bool CustLogInfoTest(int userid)
+        {
+            CustLogInfo l = new CustLogInfo();
+            l.UserId=userid;
+            return a.Add(l);
+        }
+       
+    }
+}
